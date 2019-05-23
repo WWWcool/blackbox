@@ -170,7 +170,8 @@ namespace LOCSEARCH {
                 //FT best_f = fcur;
                 FT x_best[n];
                 int numb_of_best_vec = 0.0;
-                main_dir = new FT[n];
+                //main_dir = new FT[n];
+                main_dir = new FT[mOptions.numbOfPoints];
                 snowgoose::VecUtils::vecSet(n, 0., main_dir);
                 FT delta_f[mOptions.numbOfPoints];
                 FT min_delta_f[mOptions.numbOfPoints];
@@ -184,19 +185,16 @@ namespace LOCSEARCH {
                         {
                             xtmp[j] = x[j] + dirs[i * n + j] * h;
                         }
-                        //if (!isInBox(n, xtmp, leftBound, rightBound)) continue;
-                        int box_flag = isInBox(n, xtmp, leftBound, rightBound);
-                        if ( box_flag != 0)
-                        {
-                            box_flag == 1 ? snowgoose::VecUtils::vecCopy(n, rightBound, xtmp) : snowgoose::VecUtils::vecCopy(n, leftBound, xtmp);
-                        }
+
+                        isInBox(n, xtmp, leftBound, rightBound);
 
                         delta_f[i] = f(xtmp);
                         //save direction for stochatic antigradient
                         min_delta_f[i] = delta_f[i] - fcur;
                         for (int j = 0; j < n; j++)
                         {
-                            main_dir[j] += dirs[i * n + j] * min_delta_f[i];
+                            //main_dir[j] += dirs[i * n + j] * min_delta_f[i];
+                             main_dir[i] += dirs[i * n + j] * min_delta_f[i];
                         }
 
                         //if value in this point less than previous one, trying to make a bigger step in this direction
@@ -205,12 +203,8 @@ namespace LOCSEARCH {
                             FT x_continued[n];
                             snowgoose::VecUtils::vecSaxpy(n, xtmp, x, -1.0, x_continued);
                             snowgoose::VecUtils::vecSaxpy(n, x, x_continued, mOptions.mInc, x_continued);
-                            //if (!isInBox(n, x_continued, leftBound, rightBound)) continue;
-                            int box_flag1 = isInBox(n, x_continued, leftBound, rightBound);
-                            if ( box_flag1 != 0)
-                            {
-                                box_flag1 == 1 ? snowgoose::VecUtils::vecCopy(n, rightBound, x_continued) : snowgoose::VecUtils::vecCopy(n, leftBound, x_continued);
-                            }
+
+                            isInBox(n, x_continued, leftBound, rightBound);
 
                             FT f_continued = f(x_continued);
                             if (f_continued < delta_f[i]) f_best[i] = f_continued;
@@ -228,11 +222,14 @@ namespace LOCSEARCH {
                     {
                         xtmp[j] = x[j] + dirs[ numb_of_best_vec * n + j] * h;
                     }
+                    isInBox(n, xtmp, leftBound, rightBound);
                     FT fn = f(xtmp);
                     if (fn != fcur) {
                         FT x_continued[n];
                         snowgoose::VecUtils::vecSaxpy(n, xtmp, x, -1.0, x_continued);
                         snowgoose::VecUtils::vecSaxpy(n, x, x_continued, mOptions.mInc, x_continued);
+                        isInBox(n, x_continued, leftBound, rightBound);
+
                         snowgoose::VecUtils::vecCopy(n, x_continued, x);
                     }
                     else snowgoose::VecUtils::vecCopy(n, xtmp, x);
@@ -249,7 +246,7 @@ namespace LOCSEARCH {
                     FT xtmp[n];
                     //make a step in the calculated direction and save it in case of success
                     snowgoose::VecUtils::vecSaxpy(n, x, main_dir, h, xtmp);
-                    if (isInBox(n, xtmp, leftBound, rightBound)) {
+                    if (isInBox(n, xtmp, leftBound, rightBound) == 0) {
                         FT fn = f(xtmp);
                         if (fn < fcur)
                         {
@@ -275,25 +272,25 @@ namespace LOCSEARCH {
                     std::cout << "sft =" << sft << std::endl;
                 }
 
-                if (StepNumber >= mOptions.maxStepNumber) br = true;
-                else {
-                    if (!success) {
-                        if (sft > mOptions.minStep) sft = dec(sft);
-                        else
-                            br = true;
-                    } else sft = inc(sft);
-                }
-
-                // if (success)
-                // {
-                //     if (StepNumber >= mOptions.maxStepNumber) br = true;
-                //     else sft = inc(sft);
-                // }
+                // if (StepNumber >= mOptions.maxStepNumber) br = true;
                 // else {
-                //     if (sft > mOptions.minStep) sft = dec(sft);
-                //     else
-                //         br = true;
+                //     if (!success) {
+                //         if (sft > mOptions.minStep) sft = dec(sft);
+                //         else
+                //             br = true;
+                //     } else sft = inc(sft);
                 // }
+
+                if (success)
+                {
+                    if (StepNumber >= mOptions.maxStepNumber) br = true;
+                    else sft = inc(sft);
+                }
+                else {
+                    if (sft > mOptions.minStep) sft = dec(sft);
+                    else
+                        br = true;
+                }
 
                 for (auto s : mStoppers) {
                     if (s(fcur, x, StepNumber)) {
@@ -338,17 +335,20 @@ namespace LOCSEARCH {
             std::cout << snowgoose::VecUtils::vecPrint(n, array) << std::endl;
         }
 
-        int isInBox(int n, const FT* x, const FT* a, const FT* b) const {
+        int isInBox(int n, FT* x, const FT* a, const FT* b) const {
+            int res = 0;
             for (int i = 0; i < n; i++) {
                 if (x[i] > b[i]) {
-                    return 1;
+                    x[i] = b[i];
+                    res = 1;
                 }
 
                 if (x[i] < a[i]) {
-                    return -1;
+                    x[i] = a[i];
+                    res = 1;
                 }
             }
-            return 0;
+            return res;
         }
 
         void printVector(int n, std::vector<FT> vector) const {

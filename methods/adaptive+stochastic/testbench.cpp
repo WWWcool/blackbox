@@ -123,37 +123,37 @@ double testLayer_2(const double* x){
 }
 
 int main(int argc, char** argv) {
-    // const double mInc = 1.418; // 1.1 - 2
-    // const double mDec = 0.668; // 0.1 - 0.9
+    const double mInc = 1.418; // 1.1 - 2
+    const double mDec = 0.668; // 0.1 - 0.9
 
-    // Benchmarks<double> tests;
-    // for(auto bm : tests){
-    //     testRes res;
-    //     res = testBench(bm, mInc, mDec);
-    //     std::cout << res.desc << "\n\t\t";
-    //     std::cout << res.globMin << "\t";
-    //     std::cout << res.findMin << "\t" << "\n";
-    // }
+    Benchmarks<double> tests;
+    for(auto bm : tests){
+        testRes res;
+        res = testBench(bm, mInc, mDec);
+        std::cout << res.desc << "\n\t\t";
+        std::cout << res.globMin << "\t";
+        std::cout << res.findMin << "\t" << "\n";
+    }
 
-    LOCSEARCH::AdaptiveStochasticMethod<double> searchMethod;
-    searchMethod.getOptions().mDoTracing = false;
-    searchMethod.getOptions().maxStepNumber = 50;
-    searchMethod.getOptions().mInc = 1.418;
-    //searchMethod.getOptions().mDec = 0.368;
-    searchMethod.getOptions().mDec = 0.668;
-    searchMethod.getOptions().numbOfPoints = 100;
-    double a[2] = {1.1, 0.1}, b[2] = {2, 0.9};
-    double x[2] = {1.6, 0.5};
+    // LOCSEARCH::AdaptiveStochasticMethod<double> searchMethod;
+    // searchMethod.getOptions().mDoTracing = false;
+    // searchMethod.getOptions().maxStepNumber = 50;
+    // searchMethod.getOptions().mInc = 1.418;
+    // //searchMethod.getOptions().mDec = 0.368;
+    // searchMethod.getOptions().mDec = 0.668;
+    // searchMethod.getOptions().numbOfPoints = 100;
+    // double a[2] = {1.1, 0.1}, b[2] = {2, 0.9};
+    // double x[2] = {1.6, 0.5};
 
-    std::function<double (const double*) > func = [&] (const double * x) {
-        return testLayer_2(x);
-        // return testLayer(x);
-    };
+    // std::function<double (const double*) > func = [&] (const double * x) {
+    //     return testLayer_2(x);
+    //     // return testLayer(x);
+    // };
 
-    double result = searchMethod.search(2, x, a, b, func);
+    // double result = searchMethod.search(2, x, a, b, func);
 
-    std::cout /*<< "Found value = " */<< result << "\t";
-    std::cout /* << "At " */<< snowgoose::VecUtils::vecPrint(2, x) << "\t" << "\n";
+    // std::cout /*<< "Found value = " */<< result << "\t";
+    // std::cout /* << "At " */<< snowgoose::VecUtils::vecPrint(2, x) << "\t" << "\n";
 
     return 0;
 }

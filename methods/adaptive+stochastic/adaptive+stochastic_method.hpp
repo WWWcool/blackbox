@@ -275,25 +275,25 @@ namespace LOCSEARCH {
                     std::cout << "sft =" << sft << std::endl;
                 }
 
-                /*if (StepNumber >= mOptions.maxStepNumber) br = true;
+                if (StepNumber >= mOptions.maxStepNumber) br = true;
                 else {
                     if (!success) {
                         if (sft > mOptions.minStep) sft = dec(sft);
                         else
                             br = true;
                     } else sft = inc(sft);
-                } */
+                }
 
-                if (success)
-                {
-                    if (StepNumber >= mOptions.maxStepNumber) br = true;
-                    else sft = inc(sft);
-                }
-                else {
-                    if (sft > mOptions.minStep) sft = dec(sft);
-                    else
-                        br = true;
-                }
+                // if (success)
+                // {
+                //     if (StepNumber >= mOptions.maxStepNumber) br = true;
+                //     else sft = inc(sft);
+                // }
+                // else {
+                //     if (sft > mOptions.minStep) sft = dec(sft);
+                //     else
+                //         br = true;
+                // }
 
                 for (auto s : mStoppers) {
                     if (s(fcur, x, StepNumber)) {

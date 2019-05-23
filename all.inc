@@ -28,9 +28,12 @@ OPTIMOPT=-O
 STD_OPT = -std=c++17
 
 TESTLIB = $(ROOT)/tests
+OPTITEST = $(ROOT)/../OPTITEST_ANDREY
+COMPI = $(ROOT)/../COMPI
+SNOWGOOSE = $(ROOT)/../snowgoose
 
-EXTRA_INC = -I$(TESTLIB) 
- 
+EXTRA_INC = -I$(TESTLIB) -I$(OPTITEST) -I$(SNOWGOOSE) -I$(COMPI)
+
 #common options
 COMOPTS = $(STD_OPT)\
 	   -I$(ROOT)\
@@ -58,16 +61,16 @@ tests:
 
 # Uncomment this if you want testing finishes after first finished test
 #	@for i in $(TESTS); do if ./$$i > /dev/null; then echo TEST PASSED; continue; else echo TEST FAILED; return 1; fi done
-	
+
 
 $(BINS): $(LIBS) $(EXTLIBS)
 
 $(LIBS): $(OBJS)
 	$(LIBTOOL) $@ $(OBJS)
 
-indent: 
+indent:
 	indent *.cpp ; indent *.hpp
-clean: 
+clean:
 	rm -f *.exe *.o *.a *~ *.log deps.inc
 
 dep:

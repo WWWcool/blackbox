@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   testmodelbasedmethod.cpp
  * Author: andrei
  *
@@ -10,17 +10,17 @@
 #include "math.h"
 
 #include "testfuncs/manydim/benchmarks.hpp"
-#include <oneobj/contboxconstr/benchmarkfunc.hpp>
+#include "oneobj/contboxconstr/benchmarkfunc.hpp"
 
 using BM = Benchmark<double>;
 using namespace std;
 
 bool testBench(std::shared_ptr<BM> bm, double eps) {
     const int dim = bm->getDim();
-    
+
     OPTITEST::BenchmarkProblemFactory problemFactory(bm);
     COMPI::MPProblem<double> *mpp = problemFactory.getProblem();
-    
+
     LOCSEARCH::ModelBasedMethod<double> searchMethod;
     searchMethod.getOptions().mDoTracing = false;
     searchMethod.getOptions().mMaxIterations = 1000;
@@ -28,7 +28,7 @@ bool testBench(std::shared_ptr<BM> bm, double eps) {
     searchMethod.getOptions().mMinGrad = eps;
     searchMethod.getOptions().mFunctionGlobMin = bm->getGlobMinY();
     searchMethod.getOptions().mDoSavingPath = false;
-    
+
     double a[dim], b[dim];
     double x[dim];
     for (int i = 0; i < dim; i++) {
@@ -36,13 +36,13 @@ bool testBench(std::shared_ptr<BM> bm, double eps) {
         b[i] = bm->getBounds()[i].second;
         x[i] = (b[i] + a[i]) / 2.0;
     }
-    
+
     std::function<double (const double*) > func = [&] (const double * x) {
         return mpp->mObjectives.at(0)->func(x);
     };
 
     double result = searchMethod.search(dim, x, a, b, func);
-    
+
     std::cout << bm->getDesc() << "\t";
     std::cout /*<< "Glob. min. = " */<< bm->getGlobMinY() << "\t";
     std::cout /*<< "Glob. min. x = " */ << snowgoose::VecUtils::vecPrint(dim, bm->getGlobMinX().data()) << "\t";
